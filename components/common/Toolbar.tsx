@@ -8,6 +8,7 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { SearchJobs } from "./SearchJobs";
+import { MachineCategory } from "./MachineCategory";
 
 /**
  * Toolbar
@@ -20,20 +21,8 @@ export default function Toolbar() {
       {/* Search Jobs */}
       <SearchJobs />
 
-      {/* All Priorities */}
-      <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors whitespace-nowrap">
-        <ListFilter className="w-4 h-4 text-zinc-400" />
-        All Priorities
-        <svg
-          className="w-3 h-3 text-zinc-400 ml-0.5"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </button>
+      {/* Machines Category */}
+      <MachineCategory />
 
       {/* This Week */}
       <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors whitespace-nowrap">

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { BellIcon, MailIcon, MessageSquareIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,10 +11,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { machine } from "os";
-
-export function DropdownMenuCheckboxesIcons() {
-  const [machine, setMachine] = useState([
+export function MachineCategory() {
+  const [machines, setMachines] = useState([
     {
       machine_name: "Ryobi 2",
       is_checked: false,
@@ -29,7 +26,7 @@ export function DropdownMenuCheckboxesIcons() {
       is_checked: false,
     },
     {
-      machine_name: "Faltbed 1",
+      machine_name: "Flatbed 1",
       is_checked: false,
     },
     {
@@ -38,40 +35,45 @@ export function DropdownMenuCheckboxesIcons() {
     },
   ]);
 
+  const toggleMachine = (index: number, checked: boolean) => {
+    const newMachines = [...machines];
+    newMachines[index].is_checked = checked;
+    setMachines(newMachines);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">Notifications</Button>
+        <Button variant="outline" className="text-sm font-normal text-zinc-600">
+          Select Machines
+          <svg
+            className="w-3 h-3 text-zinc-400 ml-0.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48">
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Notification Preferences</DropdownMenuLabel>
+          <DropdownMenuLabel>Machines</DropdownMenuLabel>
 
-          <DropdownMenuCheckboxItem
-            checked={machine["ryobi_3"]}
-            onCheckedChange={(checked) =>
-              setMachine({ ...machine, ryobi_3: checked === true })
-            }
-          >
-            <BellIcon />
-            Push notifications
-          </DropdownMenuCheckboxItem>
+          {machines.map((machine, index) => (
+            <DropdownMenuCheckboxItem
+              key={machine.machine_name}
+              checked={machine.is_checked}
+              onCheckedChange={(checked) =>
+                toggleMachine(index, checked === true)
+              }
+            >
+              {machine.machine_name}
+            </DropdownMenuCheckboxItem>
+          ))}
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-}
-
-function renderMachineList(machines: Record<string, boolean>) {
-  return (
-    <DropdownMenuCheckboxItem
-      checked={machine.isChecked}
-      onCheckedChange={(checked) =>
-        setMachine({ ...machine, ryobi_1: checked === true })
-      }
-    >
-      <MailIcon />
-      Email notifications
-    </DropdownMenuCheckboxItem>
   );
 }
