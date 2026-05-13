@@ -9,7 +9,7 @@ import { useJobCardStore } from "@/store/job-card/job-card";
 import { API_BASE_URL } from "@/lib/config";
 
 export default function Navbar() {
-  const activeIndex = useJobCardStore((s) => s.activeIndex);
+  const { job_number: activeJobNumber, active_run_order } = useJobCardStore();
   const [sheetUpdated, setSheetUpdated] = useState(false);
   const [message, setMessage] = useState("");
   const [jobNumber, setJobNumber] = useState("");
@@ -58,12 +58,13 @@ export default function Navbar() {
         </p>
       </div>
 
-      {activeIndex !== null && (
+      {activeJobNumber !== null && (
         <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-50 border border-orange-200 rounded-lg">
           <span className="text-[12px] text-zinc-500">Dragging card</span>
           <span className="text-[12px] font-semibold text-orange-500 bg-orange-100 px-2 py-0.5 rounded-md">
-            #{activeIndex}
+            #{activeJobNumber}
           </span>
+          <span className="text-[12px] text-zinc-400">order: {active_run_order}</span>
         </div>
       )}
 

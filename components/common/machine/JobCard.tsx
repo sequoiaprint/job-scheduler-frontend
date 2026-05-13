@@ -1,6 +1,5 @@
 import { Calendar } from "lucide-react";
 import { useJobCardStore } from "@/store/job-card/job-card";
-import { DropArea } from "./DropArea";
 
 const heartbeatStyle = `
   @keyframes heartbeat {
@@ -21,8 +20,6 @@ export function JobCard({
   created_at,
   priority,
   run_order,
-  onDrop,
-  machineName,
   index,
 }: {
   jobName?: string;
@@ -32,15 +29,13 @@ export function JobCard({
   created_at?: string;
   priority?: number;
   run_order: number;
-  machineName: string;
-  onDrop: (machineName: string, position: number) => void;
   index: number;
 }) {
-  const setActiveIndex = useJobCardStore((s) => s.setActiveIndex);
+  const setActiveCard = useJobCardStore((s) => s.setActiveCard);
   const isRecentUpdated =
     updated_at && (Date.now() - new Date(updated_at).getTime()) / 1000;
   const isRecent =
-    isRecentUpdated && isRecentUpdated <= 300 && created_at !== updated_at;
+    isRecentUpdated && isRecentUpdated <= 30 && created_at !== updated_at;
 
   return (
     <>
@@ -48,18 +43,19 @@ export function JobCard({
       <div
         className={`bg-white rounded-2xl p-4 shadow-sm border border-zinc-200/80 hover:shadow-md cursor-pointer hover:border-zinc-300 transition-all duration-200 ${isRecent ? "heartbeat" : ""} select-none`}
         draggable={true}
-        onDragStart={() => setActiveIndex(run_order)}
-        onDragEnd={() => setActiveIndex(null)}
+        onDragStart={() => setActiveCard(job_number ?? null, run_order)}
+        onDragEnd={() => setActiveCard(null, null)}
         onClick={() => console.log(run_order)}
       >
         <div>
-          <h3 className="font-medium text-zinc-800 text-[14px] leading-tight mb-1">
-            {jobName}
-          </h3>
-          <div className="inline-flex items-center gap-1.5 mb-3">
-            <span className="text-[13px] text-zinc-400 font-normal">
-              Job Number:{" "}
-            </span>
+          <div className="flex items-start justify-between">
+            <h3 className="font-medium text-zinc-800 text-[14px] leading-tight mb-1">
+              {jobName}
+            </h3>
+            <span className="text-zinc-500 text-[12px]">{index + 1}</span>
+          </div>
+
+          <div className="inline-flex items-center gap-1.5">
             <span className="text-[13px] font-medium text-white bg-orange-400 px-2 py-0.5 rounded-md tracking-wide">
               #{job_number}
             </span>
@@ -68,31 +64,16 @@ export function JobCard({
             >
               #{priority}
             </span>
-          </div>
-        </div>
 
-        <div className="flex flex-col gap-2.5">
-          <div className="flex items-start gap-2">
-            <Calendar size={14} className="text-zinc-400 mt-0.5" />
-            <div className="flex justify-between w-full gap-1 text-[13px]">
-              <span className="text-zinc-500">
-                <span className="text-zinc-800 font-normal">Deadline: </span>
-                {deadline}
-              </span>
-
-              <span className="text-zinc-500">
-                <span className="text-zinc-800 font-normal"></span>
-                {index + 1}
-              </span>
+            <div className="flex items-start gap-2 bg-[#ffffffaf] px-2 py-0.5 text-black rounded-md border">
+              <Calendar size={14} className="mt-0.5" />
+              <div className="flex justify-between w-full gap-1 text-[13px]">
+                <span className="">{deadline}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <DropArea
-        onDrop={onDrop}
-        machineName={machineName}
-        position={run_order}
-      />
     </>
   );
 }

@@ -1,12 +1,12 @@
 "use client";
 
+import React from "react";
 import { Minus, Printer } from "lucide-react";
 import { JobCard } from "./JobCard";
 import { DropArea } from "./DropArea";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useJobCardStore } from "@/store/job-card/job-card";
 
 export interface Job {
   job_id?: string;
@@ -48,19 +48,6 @@ export function MachineColumn({
     fetchJobsByMachine();
   }, []);
 
-  const activeIndex = useJobCardStore((s) => s.activeIndex);
-
-  const onDrop = (machineName: string, position: number) => {
-    console.log(
-      "dragged run_order:",
-      activeIndex,
-      "drop position:",
-      position,
-      "machine:",
-      machineName,
-    );
-  };
-
   return (
     <div className="w-90 shrink-0 bg-[#fbfbfb] rounded-2xl border border-zinc-200 flex flex-col overflow-hidden shadow-xl max-h-full">
       {/* Header */}
@@ -88,29 +75,40 @@ export function MachineColumn({
       {/* Content area */}
       <div className="flex flex-1 p-2 gap-4 max-h-[calc(100%-64px)]">
         {/* Cards */}
-        <div className="flex-1 flex flex-col gap-4 overflow-y-auto pb-2 max-h-full px-1">
-          <DropArea onDrop={onDrop} machineName={machineName} position={1000} />
-          {isLoading
-            ? [0, 1, 2].map((id, index) => (
-                <Skeleton className="bg-[#e6e6e6] h-30 w-full" key={index} />
-              ))
-            : jobs.map((job, index) => (
-                <JobCard
-                  jobName={job?.job_name}
-                  deadline={
-                    job?.revised_delivery_date || job?.expected_delivery_date
-                  }
-                  key={job?.job_id}
-                  job_number={job?.job_number}
-                  updated_at={job?.updated_at}
-                  created_at={job?.created_at}
-                  priority={job?.job_priority}
-                  run_order={job?.run_order}
-                  machineName={job?.machine_name}
-                  onDrop={onDrop}
-                  index={index}
-                />
+        <div className="flex-1 flex flex-col gap-3 overflow-y-auto pb-2 max-h-full px-1">
+          {isLoading ? (
+            [0, 1, 2].map((_, index) => (
+              <Skeleton className="bg-[#e6e6e6] h-30 w-full" key={index} />
+            ))
+          ) : (
+            <>
+              <DropArea
+                prevRunOrder={null}
+                nextRunOrder={jobs[0]?.run_order ?? null}
+              />
+              {jobs.map((job, index) => (
+                <React.Fragment key={job?.job_id}>
+                  <JobCard
+                    key={job?.job_id}
+                    jobName={job?.job_name}
+                    deadline={
+                      job?.revised_delivery_date || job?.expected_delivery_date
+                    }
+                    job_number={job?.job_number}
+                    updated_at={job?.updated_at}
+                    created_at={job?.created_at}
+                    priority={job?.job_priority}
+                    run_order={job?.run_order}
+                    index={index}
+                  />
+                  <DropArea
+                    prevRunOrder={job.run_order}
+                    nextRunOrder={jobs[index + 1]?.run_order ?? null}
+                  />
+                </React.Fragment>
               ))}
+            </>
+          )}
         </div>
       </div>
     </div>

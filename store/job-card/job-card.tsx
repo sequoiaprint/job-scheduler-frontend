@@ -1,11 +1,13 @@
 import { create } from "zustand";
 
 interface JobCardStore {
-  activeIndex: number | null;
-  setActiveIndex: (index: number | null) => void;
+  job_number: string | null;
+  active_run_order: number | null;
+  setActiveCard: (job_number: string | null, active_run_order: number | null) => void;
 }
 
 export const useJobCardStore = create<JobCardStore>((set) => ({
-  activeIndex: null,
-  setActiveIndex: (index) => set({ activeIndex: index }),
+  job_number: null,
+  active_run_order: null,
+  setActiveCard: (job_number, active_run_order) => set({ job_number, active_run_order }),
 }));
