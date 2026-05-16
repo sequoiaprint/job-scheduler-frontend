@@ -1,5 +1,5 @@
 import Toolbar from "./Toolbar";
-import { MachineColumn } from "./machine/MachineColumn";
+import { MachineColumn } from "../machine/MachineColumn";
 import { API_BASE_URL } from "@/lib/config";
 
 export default function Main() {

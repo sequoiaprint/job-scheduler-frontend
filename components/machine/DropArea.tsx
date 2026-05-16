@@ -6,9 +6,11 @@ import { useJobCardStore } from "@/store/job-card/job-card";
 export function DropArea({
   prevRunOrder,
   nextRunOrder,
+  machineName,
 }: {
   prevRunOrder: number | null;
   nextRunOrder: number | null;
+  machineName: string;
 }) {
   const [showDrop, setShowDrop] = useState(false);
   const { job_number, active_run_order } = useJobCardStore();
@@ -23,6 +25,7 @@ export function DropArea({
       current_run_order: String(active_run_order),
       prev_run_order: prevRunOrder !== null ? String(prevRunOrder) : null,
       next_run_order: nextRunOrder !== null ? String(nextRunOrder) : null,
+      machine_name: machineName,
     });
 
     if (response.data.status) {

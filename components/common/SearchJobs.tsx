@@ -10,9 +10,6 @@ export function SearchJobs() {
         placeholder="Search jobs by name, number, or client..."
         className="flex-1 bg-transparent text-sm text-zinc-700 placeholder:text-zinc-400 outline-none border-none focus:ring-0 focus:border-none focus-visible:ring-0 focus-visible:border-none h-6"
       />
-      <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400 bg-zinc-100 border border-zinc-200 rounded">
-        ⌘K
-      </kbd>
     </div>
   );
 }

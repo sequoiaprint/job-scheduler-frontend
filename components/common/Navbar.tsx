@@ -2,57 +2,32 @@
 
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { Menu } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { useJobCardStore } from "@/store/job-card/job-card";
+import { useUserStore } from "@/store/user/user";
 import { API_BASE_URL } from "@/lib/config";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const { job_number: activeJobNumber, active_run_order } = useJobCardStore();
-  const [sheetUpdated, setSheetUpdated] = useState(false);
-  const [message, setMessage] = useState("");
-  const [jobNumber, setJobNumber] = useState("");
+  const { user, clearUser } = useUserStore();
+  const router = useRouter();
 
-  useEffect(() => {
-    const socket = io(API_BASE_URL);
-    console.log(socket);
-
-    socket.on(
-      "sheet:updated",
-      (data: { message: string; jobNumber: string }) => {
-        console.log("log");
-        setMessage(data.message);
-        setJobNumber(data.jobNumber);
-        setSheetUpdated(true);
-      },
-    );
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  const onButtonClick = async () => {
-    console.log("Hit");
-    const response = await axios.put(
-      `${API_BASE_URL}/api/sheet/update`,
-      {
-        jobNumber,
-      },
-    );
-    const data = response.data;
-    console.log(data);
-
-    if (data.status) {
-      window.location.reload();
-    }
+  const handleLogout = () => {
+    clearUser();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    router.replace("/login");
   };
+
+
 
   return (
     <header className="w-full h-[72px] justify-between shrink-0 flex items-center px-4 py-2 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700">
       <div>
-        <h1 className="text-2xl font-bold">Job Scheduler</h1>
+        <h1 className="text-2xl font-bold">ATLAS</h1>
         <p className="text-sm text-zinc-500">
           Manage and track all printing jobs
         </p>
@@ -64,18 +39,36 @@ export default function Navbar() {
           <span className="text-[12px] font-semibold text-orange-500 bg-orange-100 px-2 py-0.5 rounded-md">
             #{activeJobNumber}
           </span>
-          <span className="text-[12px] text-zinc-400">order: {active_run_order}</span>
+          <span className="text-[12px] text-zinc-400">
+            order: {active_run_order}
+          </span>
         </div>
       )}
 
-      {sheetUpdated && (
-        <div className="text-red-400 flex justify-center items-end flex-col">
-          <p>
-            {message} {jobNumber}
+
+
+      <div className="flex items-center gap-3">
+        <div className="bg-white border border-green-500 dark:bg-zinc-800 dark:border-zinc-700 rounded-xl px-2 py-1 shadow-sm">
+          <p className="text-[10px] font-semibold tracking-widest uppercase text-green-600">
+            Active: 12 jobs
           </p>
-          <Button onClick={onButtonClick}>Refresh</Button>
         </div>
-      )}
+        {user && (
+          <div className="flex flex-col items-end">
+            <span className="text-[13px] font-semibold text-zinc-800">{user.name}</span>
+            <span className="text-[11px] text-zinc-400 capitalize">{user.role}</span>
+          </div>
+        )}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleLogout}
+          className="flex items-center gap-1.5 text-zinc-600 hover:text-red-500 hover:border-red-300"
+        >
+          <LogOut size={14} />
+          Logout
+        </Button>
+      </div>
     </header>
   );
 }

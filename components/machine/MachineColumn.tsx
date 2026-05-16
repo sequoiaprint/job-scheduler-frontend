@@ -85,6 +85,7 @@ export function MachineColumn({
               <DropArea
                 prevRunOrder={null}
                 nextRunOrder={jobs[0]?.run_order ?? null}
+                machineName={machineName}
               />
               {jobs.map((job, index) => (
                 <React.Fragment key={job?.job_id}>
@@ -104,6 +105,7 @@ export function MachineColumn({
                   <DropArea
                     prevRunOrder={job.run_order}
                     nextRunOrder={jobs[index + 1]?.run_order ?? null}
+                    machineName={machineName}
                   />
                 </React.Fragment>
               ))}
