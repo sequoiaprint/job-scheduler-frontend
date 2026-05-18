@@ -1,3 +1,4 @@
+import Completed from "@/components/common/Completed";
 import Main from "@/components/common/Main";
 import Navbar from "@/components/common/Navbar";
 import Sidebar from "@/components/common/Sidebar";

@@ -1,19 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
 import { LogOut } from "lucide-react";
 import { Button } from "../ui/button";
-import axios from "axios";
 import { useJobCardStore } from "@/store/job-card/job-card";
 import { useUserStore } from "@/store/user/user";
-import { API_BASE_URL } from "@/lib/config";
 import { useRouter } from "next/navigation";
+import { useJobsStore } from "@/store/jobs/jobs";
+import { useMemo } from "react";
 
 export default function Navbar() {
   const { job_number: activeJobNumber, active_run_order } = useJobCardStore();
   const { user, clearUser } = useUserStore();
   const router = useRouter();
+  const jobsByMachine = useJobsStore((s) => s.jobsByMachine);
+
+  const activeJobs = useMemo(() => {
+    return Object.values(jobsByMachine)
+      .flat()
+      .filter((job) => !job.is_completed);
+  }, [jobsByMachine]);
 
   const handleLogout = () => {
     clearUser();
@@ -21,8 +26,6 @@ export default function Navbar() {
     localStorage.removeItem("user");
     router.replace("/login");
   };
-
-
 
   return (
     <header className="w-full h-[72px] justify-between shrink-0 flex items-center px-4 py-2 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700">
@@ -45,12 +48,10 @@ export default function Navbar() {
         </div>
       )}
 
-
-
       <div className="flex items-center gap-3">
         <div className="bg-white border border-green-500 dark:bg-zinc-800 dark:border-zinc-700 rounded-xl px-2 py-1 shadow-sm">
           <p className="text-[10px] font-semibold tracking-widest uppercase text-green-600">
-            Active: 12 jobs
+            Active: {activeJobs.length} jobs
           </p>
         </div>
         {user && (

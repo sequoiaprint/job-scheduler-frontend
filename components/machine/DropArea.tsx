@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "@/lib/config";
 import { useJobCardStore } from "@/store/job-card/job-card";
+import { useJobsStore } from "@/store/jobs/jobs";
 
 export function DropArea({
   prevRunOrder,
@@ -14,11 +15,27 @@ export function DropArea({
 }) {
   const [showDrop, setShowDrop] = useState(false);
   const { job_number, active_run_order } = useJobCardStore();
+  const { jobsByMachine } = useJobsStore();
+  const { removeJob } = useJobsStore();
+  const machineJobs =
+    jobsByMachine[machineName.split(" ").join("").toUpperCase()] || [];
+
+  const { setJobsForMachine } = useJobsStore();
 
   const handleDrop = async () => {
     setShowDrop(false);
 
-    if (!job_number || active_run_order === null) return;
+    console.log("DropArea Rendered", {
+      job_number,
+      active_run_order,
+      prevRunOrder,
+      nextRunOrder,
+    });
+
+    if (job_number === null) {
+      console.error("No active job selected for dropping.");
+      return;
+    }
 
     const response = await axios.put(`${API_BASE_URL}/api/jobs/update-order`, {
       job_number,
@@ -27,9 +44,27 @@ export function DropArea({
       next_run_order: nextRunOrder !== null ? String(nextRunOrder) : null,
       machine_name: machineName,
     });
+    const data = response.data;
 
-    if (response.data.status) {
-      window.location.reload();
+    const job = response.data.job;
+
+    console.log("API Response for updating job order:", data);
+
+    console.log(response);
+
+    machineJobs.push(job);
+
+    if (job.machine_name) {
+      console.log(
+        "Removing job from previous machine:",
+        job.machine_name,
+        job.job_number,
+      );
+      removeJob(job.job_number);
+    }
+
+    if (data.status) {
+      setJobsForMachine(job.machine_name, machineJobs);
     }
   };
   return (

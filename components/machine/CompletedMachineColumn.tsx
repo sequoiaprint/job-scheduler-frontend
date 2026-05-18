@@ -2,36 +2,26 @@
 
 import React from "react";
 import { Minus, Printer } from "lucide-react";
-import { JobCard } from "./JobCard";
-import { DropArea } from "./DropArea";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useJobsStore } from "@/store/jobs/jobs";
+import { CompletedJobCard } from "./CompletedJobCard";
 
-export function MachineColumn({
+export function CompletedMachineColumn({
   machineName,
   apiEndpoint,
 }: {
   machineName: string;
   apiEndpoint: string;
 }) {
-  const allJobs = useJobsStore((s) => s.jobsByMachine);
-  console.log(`All jobs in store:`, allJobs);
-  const jobs =
-    useJobsStore(
-      (s) => s.jobsByMachine[machineName.split(" ").join("").toUpperCase()],
-    ) ?? [];
-  const setJobsForMachine = useJobsStore((s) => s.setJobsForMachine);
+  const [jobs, setJobs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchJobsByMachine = async () => {
       try {
         const data = await axios.get(apiEndpoint);
-        setJobsForMachine(
-          machineName.split(" ").join("").toUpperCase(),
-          data.data.jobs,
-        );
+        setJobs(data.data.jobs || []);
       } catch (error) {
       } finally {
         setIsLoading(false);
@@ -75,15 +65,9 @@ export function MachineColumn({
             ))
           ) : (
             <>
-              <DropArea
-                prevRunOrder={null}
-                nextRunOrder={jobs[0]?.run_order ?? null}
-                machineName={machineName}
-              />
               {jobs.map((job, index) => (
                 <React.Fragment key={job?.job_id}>
-                  <JobCard
-                    key={job?.job_id}
+                  <CompletedJobCard
                     jobName={job?.job_name}
                     deadline={
                       job?.revised_delivery_date || job?.expected_delivery_date
@@ -92,13 +76,7 @@ export function MachineColumn({
                     updated_at={job?.updated_at}
                     created_at={job?.created_at}
                     priority={job?.job_priority}
-                    run_order={job?.run_order}
                     index={index}
-                  />
-                  <DropArea
-                    prevRunOrder={job.run_order}
-                    nextRunOrder={jobs[index + 1]?.run_order ?? null}
-                    machineName={machineName}
                   />
                 </React.Fragment>
               ))}

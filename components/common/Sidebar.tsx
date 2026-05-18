@@ -2,22 +2,14 @@
 
 import { API_BASE_URL } from "@/lib/config";
 import axios from "axios";
-import {
-  LayoutDashboard,
-  ClipboardList,
-  CalendarClock,
-  CheckCheck,
-  Printer,
-  Layers,
-  Settings,
-  RefreshCw,
-} from "lucide-react";
+import { ClipboardList, CheckCheck, Printer, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { Button } from "../ui/button";
 import { motion, type Transition } from "framer-motion";
 import { AllJobs } from "../jobs/Jobs";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const heartbeatTransition: Transition = {
   duration: 2,
@@ -26,12 +18,17 @@ const heartbeatTransition: Transition = {
 };
 
 const workspaceNav = [
-  { icon: ClipboardList, label: "Job Board", badge: 12, active: true },
-  { icon: CalendarClock, label: "Unscheduled", badge: null },
-  { icon: CheckCheck, label: "Completed", badge: 48 },
+  {
+    icon: ClipboardList,
+    label: "Job Board",
+    badge: null,
+    link: "/",
+  },
+  { icon: CheckCheck, label: "Completed", badge: null, link: "/completed" },
 ];
 
 export default function Sidebar() {
+  const pathname = usePathname();
   const [sheetUpdated, setSheetUpdated] = useState(false);
   const [message, setMessage] = useState("");
   const [jobNumber, setJobNumber] = useState("");
@@ -55,18 +52,7 @@ export default function Sidebar() {
     };
   }, []);
 
-  const onButtonClick = async () => {
-    console.log("Hit");
-    const response = await axios.put(`${API_BASE_URL}/api/sheet/update`, {
-      jobNumber,
-    });
-    const data = response.data;
-    console.log(data);
 
-    if (data.status) {
-      window.location.reload();
-    }
-  };
   return (
     <>
       <div className="sticky top-0 h-screen bg-zinc-50 border-r border-zinc-200 dark:border-zinc-700 flex flex-col">
@@ -81,7 +67,7 @@ export default function Sidebar() {
               alt="Sequoia Print"
               width={120}
               height={40}
-              />
+            />
           </div>
           <button className="text-zinc-400 hover:text-zinc-600">
             <svg
@@ -155,29 +141,33 @@ export default function Sidebar() {
               Workspace
             </p>
             <ul className="space-y-0.5">
-              {workspaceNav.map(({ icon: Icon, label, badge, active }) => (
-                <li key={label}>
-                  <button
-                    className={`w-full flex items-center gap-3 px-2 py-2 rounded-lg text-sm transition-colors
+              {workspaceNav.map(({ icon: Icon, label, badge, link }) => {
+                const active = pathname === link;
+                return (
+                  <li key={label}>
+                    <Link
+                      href={link}
+                      className={`w-full flex items-center gap-3 px-2 py-2 rounded-lg text-sm transition-colors
                     ${
                       active
                         ? "bg-white border border-zinc-200 text-zinc-900 font-medium shadow-sm dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
                         : "text-zinc-600 hover:bg-white hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
                     }`}
-                  >
-                    <Icon className="w-4 h-4 shrink-0" />
-                    <span className="flex-1 text-left">{label}</span>
-                    {badge !== null && (
-                      <span
-                        className={`text-xs px-1.5 py-0.5 rounded-full font-medium
+                    >
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span className="flex-1 text-left">{label}</span>
+                      {badge !== null && (
+                        <span
+                          className={`text-xs px-1.5 py-0.5 rounded-full font-medium
                       ${active ? "bg-indigo-100 text-indigo-600" : "text-zinc-500"}`}
-                      >
-                        {badge}
-                      </span>
-                    )}
-                  </button>
-                </li>
-              ))}
+                        >
+                          {badge}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </nav>
